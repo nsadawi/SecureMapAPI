@@ -23,7 +23,7 @@ async def get_map(id:int, current_user:UserSchemaOut = Depends(get_current_user)
     my_map = await database.fetch_one(query=query)
 
     if not my_map:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Map does not exists")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Map does not exist")
     return {**my_map}
 
 
