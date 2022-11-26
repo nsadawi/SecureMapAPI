@@ -27,7 +27,7 @@ router = APIRouter(
             # https://github.com/tiangolo/fastapi/issues/3258
             ,response_class=StreamingResponse
             )
-async def download_map(id:int, current_user:UserSchemaOut = Depends(get_current_user)):
+async def download_unencrypted_map(id:int, current_user:UserSchemaOut = Depends(get_current_user)):
     query = Map.select().where(id==Map.c.map_id)
     my_map = await database.fetch_one(query=query)
 
@@ -64,7 +64,7 @@ async def download_map(id:int, current_user:UserSchemaOut = Depends(get_current_
             # https://github.com/tiangolo/fastapi/issues/3258
             ,response_class=FileResponse
             )
-async def encdownload_map(id:int, current_user:UserSchemaOut = Depends(get_current_user)):
+async def download_encrypted_map(id:int, current_user:UserSchemaOut = Depends(get_current_user)):
     query = Map.select().where(id==Map.c.map_id)
     my_map = await database.fetch_one(query=query)
 
