@@ -1,10 +1,13 @@
 
 from fastapi import status, HTTPException, APIRouter, Depends
+from fastapi.responses import FileResponse
+
 from database.db import Map, database
 from schema.schema import MapSchemaIn, MapSchemaOut, UserSchemaOut
-from typing import List
+#from typing import List
 from auths import get_current_user
 
+from cryptography.fernet import Fernet
 
 router = APIRouter(
     tags = ["Maps"]
@@ -34,9 +37,21 @@ async def download_map(id:int, current_user:UserSchemaOut = Depends(get_current_
     if not my_map:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Map does not exist")
     
-    print(my_map['path'])
+    # opening the key
+    with open('/home/ubuntu/filekey.key', 'rb') as filekey:
+        key = filekey.read()
     
-    return {**my_map}
+    # using the key
+    fernet = Fernet(key)
+ 
+    # opening the encrypted file
+    with open(my_map['path'], 'rb') as enc_file:
+        encrypted = enc_file.read()
+ 
+    # decrypting the file
+    decrypted = fernet.decrypt(encrypted)
+    
+    return FileResponse(decrypted, media_type="image/png", filename="mapxyz.png")
 
 
 """
