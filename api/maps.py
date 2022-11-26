@@ -26,7 +26,27 @@ async def get_map(id:int, current_user:UserSchemaOut = Depends(get_current_user)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Map does not exist")
     return {**my_map}
 
+@router.get('/mapdownload/{id}', responses={200: {"description": "A map.", "content" : {"image/png" : {"example" : "No example available."}}}})
+async def download_map(id:int, current_user:UserSchemaOut = Depends(get_current_user)):
+    query = Map.select().where(id==Map.c.map_id)
+    my_map = await database.fetch_one(query=query)
 
+    if not my_map:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Map does not exist")
+    
+    print(my_map['path'])
+    
+    return {**my_map}
+
+
+"""
+@app.get("/cat", responses={200: {"description": "A picture of a cat.", "content" : {"image/jpeg" : {"example" : "No example available. Just imagine a picture of a cat."}}}})
+def cat():
+    file_path = os.path.join(path, "files/cat.jpg")
+    if os.path.exists(file_path):
+        return FileResponse(file_path, media_type="image/jpeg", filename="mycat.jpg")
+    return {"error" : "File not found!"}
+"""
 
 @router.post('/maps/', status_code=status.HTTP_201_CREATED)
 async def insert_data(map:MapSchemaIn, current_user:UserSchemaOut = Depends(get_current_user)):
