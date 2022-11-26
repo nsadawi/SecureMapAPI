@@ -1,6 +1,6 @@
 
 from fastapi import status, HTTPException, APIRouter, Depends
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 
 from database.db import Map, database
 from schema.schema import MapSchemaIn, MapSchemaOut, UserSchemaOut
@@ -51,7 +51,13 @@ async def download_map(id:int, current_user:UserSchemaOut = Depends(get_current_
     # decrypting the file
     decrypted = fernet.decrypt(encrypted)
     
-    return FileResponse(decrypted, media_type="image/png", filename="mapxyz.png")
+    headers = {
+        'Content-Disposition': 'attachment; filename="mapxyz.png"'
+    }
+    return StreamingResponse(decrypted, headers=headers)
+
+    
+    #return FileResponse(my_map['path'], media_type="image/png", filename="mapxyz.png")
 
 
 """
