@@ -1,5 +1,5 @@
 
-from fastapi import status, HTTPException, APIRouter, Depends
+from fastapi import status, HTTPException, APIRouter, Depends, Request
 from fastapi.responses import FileResponse, StreamingResponse, Response
 
 from database.db import Map, database
@@ -27,7 +27,9 @@ router = APIRouter(
             # https://github.com/tiangolo/fastapi/issues/3258
             ,response_class=StreamingResponse
             )
-async def download_unencrypted_map(id:int, current_user:UserSchemaOut = Depends(get_current_user)):
+async def download_unencrypted_map(id:int, request: Request, current_user:UserSchemaOut = Depends(get_current_user)):
+    client_host = request.client.host
+    print(client_host)
     query = Map.select().where(id==Map.c.map_id)
     my_map = await database.fetch_one(query=query)
 
@@ -64,7 +66,9 @@ async def download_unencrypted_map(id:int, current_user:UserSchemaOut = Depends(
             # https://github.com/tiangolo/fastapi/issues/3258
             ,response_class=FileResponse
             )
-async def download_encrypted_map(id:int, current_user:UserSchemaOut = Depends(get_current_user)):
+async def download_encrypted_map(id:int, request: Request, current_user:UserSchemaOut = Depends(get_current_user)):
+    client_host = request.client.host
+    print(client_host)
     query = Map.select().where(id==Map.c.map_id)
     my_map = await database.fetch_one(query=query)
 
